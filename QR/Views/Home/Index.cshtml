@@ -1,0 +1,121 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+
+<h2>KONUM ÖĞRENME</h2>
+<br />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+
+
+
+<div>
+
+    <br />
+    <br />
+    <label style="color:green; font-size:x-large" id="lbluyari">Lütfen Bekleyiniz...</label>
+    <br /> 
+
+    <input type="text" id="country" name="ULKE" class="form-control" />
+    <br />
+    <input type="text" id="postcode" name="POSTAKODU" class="form-control" />
+    <br />
+    <input type="text" id="province" name="SEHIR" class="form-control" />
+    <br />
+    <input type="text" id="suburb" name="SEMT" class="form-control" />
+    <br />
+    <input type="text" id="town" name="ILCE" class="form-control" />
+    <br />
+    <input type="text" id="lat" name="ENLEM" class="form-control" />
+    <br />
+    <input type="text" id="lng" name="BOYLAM" class="form-control" />
+    <br />
+
+
+
+
+
+
+
+
+</div>
+
+
+
+<script>
+    $(document).ready(function () {
+        $("#btnolustur").hide();
+        $("#lbluyari").show();
+
+        let latitude, longitude = "";
+
+
+        if (navigator.geolocation) {
+
+            navigator.geolocation.getCurrentPosition(onSuccess, onError);
+        }
+        else {
+            alert("Tarayınız konum bilgisi alamıyor...");
+        }
+
+        function onSuccess(position) {
+            let latitude = position.coords.latitude;
+            let longitude = position.coords.longitude;
+
+
+
+            const api_key = "844376962f1f4b23bc2d900940394715";
+            const url = `https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=${api_key}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(result => {
+                    let details = result.results[0].components;
+                    let detailys = result.results[0].geometry;
+
+
+                    let { country, postcode, province, suburb, town } = details;
+                    let { lat, lng } = detailys;
+
+                    $("#country").val(details.country.toString());
+                    $("#postcode").val(details.postcode.toString());
+                    $("#province").val(details.province.toString());
+                    $("#suburb").val(details.suburb.toString());
+                    $("#town").val(details.town.toString());
+                    $("#lat").val(detailys.lat.toString());
+                    $("#lng").val(detailys.lng.toString());
+
+
+                    if ($("#country").val() != "") {
+
+
+                        $("#btnolustur").show();
+                        $("#lbluyari").hide();
+                    }
+
+
+
+                });
+
+
+
+        }
+
+        function onError(error) {
+
+            if (error.code == 1) {
+                alert("Lütfen Konumunuzu Açınız..❌");
+                window.location.href = "Index";
+
+
+
+            }
+            else if (error.code == 2) {
+                alert("konum alınamadı...");
+            }
+            else {
+                alert("bir hata oluştu...");
+            }
+        }
+    });</script>
+
